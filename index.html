@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Web Bot WhatsApp</title>
+  <style>
+    :root{color-scheme:dark;font-family:Arial,sans-serif;background:#0d1117;color:#e6edf3}
+    body{margin:0;padding:28px;max-width:1000px;margin-inline:auto}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    h1{margin:0;font-size:28px} .muted{color:#9da7b3}
+    .pill{padding:8px 12px;border:1px solid #30363d;border-radius:999px;background:#161b22}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:24px}
+    .card{background:#161b22;border:1px solid #30363d;border-radius:14px;padding:18px}
+    h2{font-size:16px;margin:0 0 12px;color:#7ee787}
+    ul{margin:0;padding-left:20px;line-height:1.9}
+    .notice{margin-top:20px;border:1px solid #9e6a03;background:#2a1f0b;color:#f0d58c;padding:14px;border-radius:12px;line-height:1.5}
+    button{background:#238636;color:white;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+    footer{margin-top:24px;color:#9da7b3;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div><h1>Web Bot WhatsApp</h1><p class="muted">Dashboard sederhana • versi 4.3.0</p></div>
+    <div class="pill">Status: <strong id="status">Memuat...</strong></div>
+  </div>
+  <div class="notice">
+    <strong>Hubungkan WhatsApp:</strong> jalankan bot di komputer/server, lalu scan QR yang muncul di terminal melalui WhatsApp → Perangkat tertaut → Tautkan perangkat.
+    Dashboard ini hanya menampilkan status; QR ditampilkan di terminal, bukan di halaman web.
+  </div>
+  <h2 style="margin-top:28px;color:#e6edf3">Daftar perintah</h2>
+  <div class="grid" id="commands"></div>
+  <footer>Gunakan hanya pada akun milik sendiri. Library koneksi berbasis WhatsApp Web bukan API resmi dan dapat terputus atau terkena pembatasan. Jangan unggah folder auth_info atau data sesi ke GitHub.</footer>
+  <script>
+    async function refresh(){
+      try{
+        const r=await fetch('/api/status'); const data=await r.json();
+        document.getElementById('status').textContent=data.status;
+      }catch{document.getElementById('status').textContent='Server tidak tersedia'}
+    }
+    async function loadMenu(){
+      const r=await fetch('/api/menu'); const data=await r.json();
+      const root=document.getElementById('commands');
+      root.innerHTML='';
+      for(const [category,commands] of Object.entries(data)){
+        const card=document.createElement('section'); card.className='card';
+        const title=document.createElement('h2'); title.textContent=category; card.appendChild(title);
+        const list=document.createElement('ul');
+        for(const command of commands){const li=document.createElement('li');li.textContent=command;list.appendChild(li)}
+        card.appendChild(list);root.appendChild(card);
+      }
+    }
+    refresh();loadMenu();setInterval(refresh,5000);
+  </script>
+</body>
+</html>
